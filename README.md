@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="image/logo.jpg" alt="Research Agent Logo" width="300"/>
+</div>
+
 # 🤖 Multi-Agent Research Assistant
 
 A sophisticated AI-powered research system that combines BM25 document retrieval, Wikipedia scraping, and multi-agent debate patterns using LangGraph for comprehensive topic analysis.
