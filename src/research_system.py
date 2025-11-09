@@ -15,7 +15,7 @@ from .agents import (
     SynthesizerAgent
 )
 from .retrievers import BM25Retriever, DocumentLoader
-from .scrapers import WikipediaScraper
+from .scrapers import WikipediaScraper, ArxivScraper
 
 
 class ResearchSystem:
@@ -24,7 +24,11 @@ class ResearchSystem:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        files_dir: Optional[str] = None
+        files_dir: Optional[str] = None,
+        use_wikipedia: bool = True,
+        use_arxiv: bool = True,
+        max_wikipedia_articles: int = 3,
+        max_arxiv_papers: int = 3
     ):
         """
         Initialize research system.
@@ -32,6 +36,10 @@ class ResearchSystem:
         Args:
             api_key: GROQ API key (uses Config default if not provided)
             files_dir: Directory containing PDF files (uses Config default if not provided)
+            use_wikipedia: Whether to use Wikipedia scraper
+            use_arxiv: Whether to use ArXiv scraper
+            max_wikipedia_articles: Maximum Wikipedia articles to retrieve
+            max_arxiv_papers: Maximum ArXiv papers to retrieve
         """
         # Set API key
         if api_key:
@@ -48,7 +56,15 @@ class ResearchSystem:
         
         # Initialize components
         self.retriever: Optional[BM25Retriever] = None
-        self.wikipedia_scraper = WikipediaScraper()
+        
+        # Initialize scrapers based on configuration
+        self.use_wikipedia = use_wikipedia
+        self.use_arxiv = use_arxiv
+        self.max_wikipedia_articles = max_wikipedia_articles
+        self.max_arxiv_papers = max_arxiv_papers
+        
+        self.wikipedia_scraper = WikipediaScraper() if use_wikipedia else None
+        self.arxiv_scraper = ArxivScraper() if use_arxiv else None
         
         # Initialize agents
         self.researcher: Optional[ResearcherAgent] = None
@@ -73,11 +89,26 @@ class ResearchSystem:
         else:
             print("⚠️  BM25 retriever not created (no chunks).")
         
+        # Display scraper configuration
+        scrapers_enabled = []
+        if self.use_wikipedia:
+            scrapers_enabled.append(f"Wikipedia (max {self.max_wikipedia_articles} articles)")
+        if self.use_arxiv:
+            scrapers_enabled.append(f"ArXiv (max {self.max_arxiv_papers} papers)")
+        
+        if scrapers_enabled:
+            print(f"🌐 Scrapers enabled: {', '.join(scrapers_enabled)}")
+        else:
+            print("⚠️  No web scrapers enabled (only using local PDFs)")
+        
         # Initialize agents
         self.researcher = ResearcherAgent(
             self.llm,
             self.retriever,
-            self.wikipedia_scraper
+            self.wikipedia_scraper,
+            self.arxiv_scraper,
+            max_wikipedia_articles=self.max_wikipedia_articles,
+            max_arxiv_papers=self.max_arxiv_papers
         )
         self.reviewer_a = ReviewerAgentA(self.llm)
         self.reviewer_b = ReviewerAgentB(self.llm)

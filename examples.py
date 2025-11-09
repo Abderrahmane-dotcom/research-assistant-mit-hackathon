@@ -147,6 +147,79 @@ def example_5_batch_research():
         print(f"    Summary: {result.get('summary', 'N/A')[:100]}...")
 
 
+def example_6_full_system():
+    """Example: Use all sources (PDFs + Wikipedia + ArXiv)"""
+    print("\n" + "="*80)
+    print("📚 EXAMPLE 1: Full Multi-Source Research")
+    print("="*80 + "\n")
+    
+    # Initialize with all scrapers enabled
+    system = ResearchSystem(
+        use_wikipedia=True,
+        use_arxiv=True,
+        max_wikipedia_articles=3,
+        max_arxiv_papers=3
+    )
+    system.initialize()
+    
+    # Research a topic
+    result = system.research("machine learning for climate change")
+    system.display_results(result)
+
+
+def example_7_arxiv_only():
+    """Example: Use only ArXiv papers"""
+    print("\n" + "="*80)
+    print("📄 EXAMPLE 2: ArXiv Papers Only")
+    print("="*80 + "\n")
+    
+    # Initialize with only ArXiv
+    system = ResearchSystem(
+        use_wikipedia=False,
+        use_arxiv=True,
+        max_arxiv_papers=5
+    )
+    system.initialize()
+    
+    result = system.research("deep learning")
+    system.display_results(result)
+
+
+def example_8_wikipedia_only():
+    """Example: Use only Wikipedia"""
+    print("\n" + "="*80)
+    print("🌐 EXAMPLE 3: Wikipedia Only")
+    print("="*80 + "\n")
+    
+    system = ResearchSystem(
+        use_wikipedia=True,
+        use_arxiv=False,
+        max_wikipedia_articles=5
+    )
+    system.initialize()
+    
+    result = system.research("quantum computing")
+    system.display_results(result)
+
+
+def example_9_custom_limits():
+    """Example: Custom document limits"""
+    print("\n" + "="*80)
+    print("⚙️ EXAMPLE 4: Custom Source Limits")
+    print("="*80 + "\n")
+    
+    system = ResearchSystem(
+        use_wikipedia=True,
+        use_arxiv=True,
+        max_wikipedia_articles=2,  # Only 2 Wikipedia articles
+        max_arxiv_papers=2          # Only 2 ArXiv papers
+    )
+    system.initialize()
+    
+    result = system.research("artificial intelligence ethics")
+    system.display_results(result)
+
+
 def main():
     """Run examples"""
     print("=" * 80)
@@ -158,10 +231,14 @@ def main():
     print("  3. ArXiv paper scraping")
     print("  4. Custom BM25 retriever")
     print("  5. Batch research on multiple topics")
+    print("  6. Full multi-source research")
+    print("  7. ArXiv papers only")
+    print("  8. Wikipedia only")
+    print("  9. Custom limits for sources")
     print("  0. Run all examples")
     
     try:
-        choice = input("\nSelect example (0-5): ").strip()
+        choice = input("\nSelect example (0-9): ").strip()
         
         examples = {
             '1': example_1_basic_research,
@@ -169,6 +246,10 @@ def main():
             '3': example_3_arxiv_scraping,
             '4': example_4_custom_retriever,
             '5': example_5_batch_research,
+            '6': example_6_full_system,
+            '7': example_7_arxiv_only,
+            '8': example_8_wikipedia_only,
+            '9': example_9_custom_limits,
         }
         
         if choice == '0':
